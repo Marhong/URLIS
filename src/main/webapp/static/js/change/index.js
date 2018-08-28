@@ -64,6 +64,7 @@
            });
 
            $("#table").append(tbody);
+           $('#kkpager').hide();
     	}else{
     		alert("暂无数据");	
     	}

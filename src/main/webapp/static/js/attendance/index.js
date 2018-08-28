@@ -62,6 +62,7 @@
 
            $("#table").append(tbody);
            initPage();
+           $('#kkpager').hide();
     	}else{
     		alert("暂无数据");
  

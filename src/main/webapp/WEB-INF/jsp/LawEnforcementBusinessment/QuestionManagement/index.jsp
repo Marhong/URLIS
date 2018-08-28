@@ -90,11 +90,12 @@ body {
 			</tbody>
 		</table>
 	</form>
-	<div style="width:800px;margin:0 auto;">
+	
+<div style="width:800px;margin:0 auto;">
 <div id="kkpager"></div>
 </div>
-
 </body>
+
 </html>
 <script>
 	$(function() {

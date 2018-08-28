@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,6 +25,7 @@ import com.hwadee.model.AssessmentEntity;
 import com.hwadee.model.AttendanceEntity;
 import com.hwadee.model.DepartmentEntity;
 import com.hwadee.model.PersonEntity;
+import com.hwadee.model.QuestionEntity;
 import com.hwadee.util.MyBatiesUtil;
 
 /**
@@ -37,16 +39,48 @@ import com.hwadee.util.MyBatiesUtil;
 public class AttendanceController {
 	
 	@RequestMapping("/index")
-	public String indexAttendance(Model model) {
+	public ModelAndView indexAttendance(String pno) {
 		List<AttendanceEntity> attnlist = new ArrayList<AttendanceEntity>();
 		SqlSession session = MyBatiesUtil.getSqlSession();
 		IAttendanceDao attnDao = session.getMapper(IAttendanceDao.class);
 		attnlist = attnDao.getAllAttendance();
 
 		MyBatiesUtil.closeSqlSession();
-		model.addAttribute("attnlist",attnlist);
+		ModelMap model = new ModelMap();
+		if(attnlist.size()>0) {
+			List<AttendanceEntity> tenQuestions = new ArrayList<AttendanceEntity>();
+			int count = 0;
+			int no = 0;
+			if(pno != null && !pno.equals("")) {
+				no= Integer.parseInt(pno)-1;
+			}else {
+				no=0;
+			}
+			 
+			for(int i=(10*no);i<attnlist.size();i++) {
+				tenQuestions.add(attnlist.get(i));
+				count++;
+				if(count == 10) {
+					break;
+				}
+			}
+			model.addAttribute("attnlist",tenQuestions);
+			model.addAttribute("totalRecords",attnlist.size());
+			int totalPage = 0;
+			if(attnlist.size()%10 != 0) {
+				totalPage = attnlist.size()/10+1;
+				
+			}else {
+				totalPage = attnlist.size()/10;
+			
+			}
+			
+			model.addAttribute("totalPage",totalPage);
+		}
 		
-		return "/JobPerformanceAssessment/AttendanceManagement/index";
+		return new ModelAndView("/JobPerformanceAssessment/AttendanceManagement/index",model);
+		
+
 	}
 	@RequestMapping("/search")
 	@ResponseBody

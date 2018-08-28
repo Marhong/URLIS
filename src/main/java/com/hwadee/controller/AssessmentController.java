@@ -39,7 +39,7 @@ import com.hwadee.util.MyBatiesUtil;
 public class AssessmentController {
 
 	@RequestMapping("/index")
-	public ModelAndView indexAssessment() {
+	public ModelAndView indexAssessment(String pno) {
 		List<AssessmentEntity> assesslist = new ArrayList<AssessmentEntity>();
 		SqlSession session = MyBatiesUtil.getSqlSession();
 		IAssessmentDao assessDao = session.getMapper(IAssessmentDao.class);
@@ -48,9 +48,39 @@ public class AssessmentController {
 
 		MyBatiesUtil.closeSqlSession();
 		ModelMap model = new ModelMap();
-
-		model.addAttribute("assesslist", assesslist);
-		return new ModelAndView("/JobPerformanceAssessment/AssessmentManagement/index", model);
+		if(assesslist.size()>0) {
+			List<AssessmentEntity> tenQuestions = new ArrayList<AssessmentEntity>();
+			int count = 0;
+			int no = 0;
+			if(pno != null && !pno.equals("")) {
+				no= Integer.parseInt(pno)-1;
+			}else {
+				no=0;
+			}
+			 
+			for(int i=(10*no);i<assesslist.size();i++) {
+				tenQuestions.add(assesslist.get(i));
+				count++;
+				if(count == 10) {
+					break;
+				}
+			}
+			model.addAttribute("assesslist",tenQuestions);
+			model.addAttribute("totalRecords",assesslist.size());
+			int totalPage = 0;
+			if(assesslist.size()%10 != 0) {
+				totalPage = assesslist.size()/10+1;
+				
+			}else {
+				totalPage = assesslist.size()/10;
+			
+			}
+			
+			model.addAttribute("totalPage",totalPage);
+		}
+		
+		return new ModelAndView("/JobPerformanceAssessment/AssessmentManagement/index",model);
+		
 	}
 
 	@RequestMapping("/add")

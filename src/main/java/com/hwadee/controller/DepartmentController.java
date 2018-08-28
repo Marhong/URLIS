@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,6 +20,7 @@ import com.hwadee.dao.IDepartmentDao;
 import com.hwadee.dao.IPersonDao;
 import com.hwadee.model.DepartmentEntity;
 import com.hwadee.model.PersonEntity;
+import com.hwadee.model.QuestionEntity;
 import com.hwadee.util.MyBatiesUtil;
 
 /**
@@ -32,16 +34,48 @@ import com.hwadee.util.MyBatiesUtil;
 public class DepartmentController {
 
 	@RequestMapping("/index")
-	public String indexDepartment(Model model) {
+	public ModelAndView indexDepartment(String pno) {
 		List<DepartmentEntity> deptlist = new ArrayList<DepartmentEntity>();
 		SqlSession session = MyBatiesUtil.getSqlSession();
 		IDepartmentDao deptDao = session.getMapper(IDepartmentDao.class);
 		deptlist = deptDao.getAllDepartment();
 
 		MyBatiesUtil.closeSqlSession();
-		model.addAttribute("deptlist",deptlist);
+		ModelMap model = new ModelMap();
+		if(deptlist.size()>0) {
+			List<DepartmentEntity> tenQuestions = new ArrayList<DepartmentEntity>();
+			int count = 0;
+			int no = 0;
+			if(pno != null && !pno.equals("")) {
+				no= Integer.parseInt(pno)-1;
+			}else {
+				no=0;
+			}
+			 
+			for(int i=(10*no);i<deptlist.size();i++) {
+				tenQuestions.add(deptlist.get(i));
+				count++;
+				if(count == 10) {
+					break;
+				}
+			}
+			model.addAttribute("deptlist",tenQuestions);
+			model.addAttribute("totalRecords",deptlist.size());
+			int totalPage = 0;
+			if(deptlist.size()%10 != 0) {
+				totalPage = deptlist.size()/10+1;
+				
+			}else {
+				totalPage = deptlist.size()/10;
+			
+			}
+			
+			model.addAttribute("totalPage",totalPage);
+		}
 		
-		return "/Organization/index";
+		return new ModelAndView("/Organization/index",model);
+		
+
 	}
 	@RequestMapping("/search")
 	@ResponseBody

@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,6 +22,7 @@ import com.hwadee.dao.IPersonDao;
 import com.hwadee.model.DepartmentEntity;
 import com.hwadee.model.InformationChangeEntity;
 import com.hwadee.model.PersonEntity;
+import com.hwadee.model.QuestionEntity;
 import com.hwadee.util.MyBatiesUtil;
 
 /**
@@ -34,7 +36,7 @@ import com.hwadee.util.MyBatiesUtil;
 public class InformationChangeController {
 	
 	@RequestMapping("/index")
-	public String indexChnage(Model model) {
+	public ModelAndView indexChnage(String pno) {
 		List<InformationChangeEntity> changeList = new ArrayList<InformationChangeEntity>();
 		SqlSession session = MyBatiesUtil.getSqlSession();
 		IInformationChangeDao changeDao = session.getMapper(IInformationChangeDao.class);
@@ -47,9 +49,41 @@ public class InformationChangeController {
 				change.setDept_id(deptDao.getDeptById(dept_id).getDept_name());
 			}
 		}
-		model.addAttribute("changeList",changeList);
+		
 		MyBatiesUtil.closeSqlSession();
-		return "/PersonnelInformation/StaffChangeManagement/index";
+		ModelMap model = new ModelMap();
+		if(changeList.size()>0) {
+			List<InformationChangeEntity> tenQuestions = new ArrayList<InformationChangeEntity>();
+			int count = 0;
+			int no = 0;
+			if(pno != null && !pno.equals("")) {
+				no= Integer.parseInt(pno)-1;
+			}else {
+				no=0;
+			}
+			 
+			for(int i=(10*no);i<changeList.size();i++) {
+				tenQuestions.add(changeList.get(i));
+				count++;
+				if(count == 10) {
+					break;
+				}
+			}
+			model.addAttribute("changeList",tenQuestions);
+			model.addAttribute("totalRecords",changeList.size());
+			int totalPage = 0;
+			if(changeList.size()%10 != 0) {
+				totalPage = changeList.size()/10+1;
+				
+			}else {
+				totalPage = changeList.size()/10;
+			
+			}
+			
+			model.addAttribute("totalPage",totalPage);
+		}
+		
+		return new ModelAndView("/PersonnelInformation/StaffChangeManagement/index",model);
 	}
 	@RequestMapping("/search")
 	@ResponseBody

@@ -11,7 +11,9 @@
     <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/css/bootstrap-responsive.css" />
     <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/css/style.css" />
 	<script type="text/javascript" src="<%=request.getContextPath()%>/static/js/department/index.js"></script>
-
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/css/kkpager_blue.css" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/static/js/kkpager.min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/static/js/util.js"></script>
     <style type="text/css">
         body {
             padding-bottom: 40px;
@@ -41,6 +43,8 @@
    &nbsp;&nbsp;&nbsp;&nbsp; <button type="button" class="btn btn-primary" id="search">查询</button>&nbsp;&nbsp;&nbsp;&nbsp; <button type="button" class="btn btn-primary" id="add">新增机构</button> 
 </form>
 <form class="form-inline definewidth m20" action="index.html" method="post"> 
+<input type="hidden" id="totalRecords" value=${totalRecords } />
+		<input type="hidden" id="totalPage" value=${totalPage } />
 <table class="table table-bordered table-hover definewidth m10" id="table">
     <thead>
     <tr>
@@ -65,13 +69,14 @@
      </tbody>
 </table>
 </form>
-<div class="inline pull-right page">
-         10122 条记录 1/507 页  <a href='#'>下一页</a>     <span class='current'>1</span><a href='#'>2</a><a href='/chinapost/index.php?m=Label&a=index&p=3'>3</a><a href='#'>4</a><a href='#'>5</a>  <a href='#' >下5页</a> <a href='#' >最后一页</a>    </div>
+<div style="width:800px;margin:0 auto;">
+<div id="kkpager"></div>
+</div>
 </body>
 </html>
 <script>
     $(function () {
-        
+    	init();
 		$('#search').click(function(){
 			search();
 		});
