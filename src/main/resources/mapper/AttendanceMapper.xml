@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwadee.dao.IAttendanceDao">
+	<!-- 添加一个返回类型为AttendanceTableUnit对象的resultMap -->
+	<resultMap type="com.hwadee.model.AttendanceEntity"
+		id="AttendanceMap">
+		<id property="attn_id" column="attn_id" />
+		<result property="per_id" column="per_id" />
+		<result property="attn_date" column="attn_date" />
+		<result property="attn_status" column="attn_status" />
+		<result property="start_time" column="start_time" />
+		<result property="end_time" column="end_time" />
+		<result property="per_name" column="per_name" />
+	</resultMap>
+	<!-- 获取所有的考勤信息 -->
+	<select id="getAllAttendance" resultMap="AttendanceMap">
+		select * from attendance
+	</select>
+	<select id="getAttnByNameAndId" resultMap="AttendanceMap">
+		select * from attendance where per_name like "%"#{param1}"%"
+		<!-- <where> <choose> <when test="#{param1}!=null"> per_name like "%"#{param1}"%" 
+			</when> <otherwise> <if test="#{param2}!=null"> per_id = #{param2} </if> 
+			</otherwise> </choose> -->
+		<!-- <if test="#{param1}!=null"> per_name like "%"#{param1}"%" </if> <if 
+			test="#{param2}!=null"> <if test="#{param2}!=''"> and per_id = #{param2} 
+			</if> </if> -->
+		<!-- </where> -->
+	</select>
+	<!-- 查询某一个月内的所有考试 -->
+	<select id="getAttnsByIdAndYearMon" resultMap="AttendanceMap">
+		select * from
+		attendance where per_id = #{param1} and
+		date_format(attn_date,'%Y-%m')= #{param2}
+	</select>
+	<!-- 添加一条考勤记录 -->
+	<insert id="insertAttendance"
+		parameterType="com.hwadee.model.AttendanceEntity">
+		insert into attendance
+		(per_id,attn_date,attn_status,start_time,end_time,per_name) values
+		(#{per_id},#{attn_date},#{attn_status},#{start_time},#{end_time},#{per_name})
+	</insert>
+	<!-- 更新一条考勤记录 -->
+	<update id="updateAttendance"
+		parameterType="com.hwadee.model.AttendanceEntity">
+		update attendance set attn_status =
+		#{attn_status},end_time = #{end_time} where attn_id = #{attn_id}
+	</update>
+	<!-- 更新一条考勤记录 -->
+	<update id="updateWholeAttendance" parameterType="com.hwadee.model.AttendanceEntity">
+		update attendance set attn_status =
+		#{attn_status},start_time = #{start_time} where attn_id = #{attn_id}
+	</update>
+	<!-- 通过身份证和日期获取考勤记录 -->
+	<select id="getAttnByPerIdAndDate" resultMap="AttendanceMap">
+		select * from attendance where per_id = #{param1} and attn_date = #{param2}
+	</select>
+</mapper>

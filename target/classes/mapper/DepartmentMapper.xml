@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwadee.dao.IDepartmentDao">
+	<!-- 添加一个返回类型为PersonEntity对象的resultMap -->
+	<resultMap type="com.hwadee.model.DepartmentEntity" id="DepartmentMap">
+		<id property="dept_id" column="dept_id"/>
+		<result property="dept_name" column="dept_name"/>
+
+	</resultMap>
+	<!--  获取所有的部门信息 -->
+	<select id="getAllDepartment" resultMap="DepartmentMap">
+		select * from department
+	</select>
+	<!-- 根据编号获取部门信息 -->
+	<select id="getDeptById" parameterType="String" resultMap="DepartmentMap">
+		select * from department where dept_id = #{dept_id}
+	</select>
+		<!-- 根据名称获取部门信息 -->
+	<select id="getDeptByName" parameterType="String" resultMap="DepartmentMap">
+		select * from department where dept_name like "%"#{dept_name}"%"
+	</select>
+	<!-- 添加一个部门 -->
+	<insert id="insertDepartment" parameterType="com.hwadee.model.DepartmentEntity">
+		INSERT INTO department (dept_id, dept_name) VALUES (#{dept_id},#{dept_name})
+	</insert>
+	<!-- 根据部门编号，更新部门信息 -->
+	<update id="updateDepartment" parameterType="com.hwadee.model.DepartmentEntity">
+		update department set dept_name = #{dept_name} where dept_id = #{dept_id}
+	</update>
+</mapper>

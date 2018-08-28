@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+  <!-- 引入外部配置文件 -->
+  <properties resource="mysql.properties"></properties>
+   
+   <!-- 配置mybatis运行环境 -->
+     <environments default="cybatis">
+        <environment id="cybatis">
+            <!-- type="JDBC" 代表使用JDBC的提交和回滚来管理事务 -->
+            <transactionManager type="JDBC" />
+            
+            <!-- mybatis提供了3种数据源类型，分别是：POOLED,UNPOOLED,JNDI -->
+            <!-- POOLED 表示支持JDBC数据源连接池 -->
+            <!-- UNPOOLED 表示不支持数据源连接池 -->
+            <!-- JNDI 表示支持外部数据源连接池 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}" />
+                <property name="url" value="${url}" />
+                <property name="username" value="${userName}" />
+                <property name="password" value="${password}" />
+            </dataSource>
+        </environment>
+    </environments> 
+    
+    <!-- 添加映射文件 -->
+    <mappers>
+    	<mapper resource="mapper/QuestionMapper.xml"/>
+    	<mapper resource="mapper/PersonMapper.xml"/>
+    	<mapper resource="mapper/DepartmentMapper.xml"/>
+    	<mapper resource="mapper/ChangeMapper.xml"/>
+    	<mapper resource="mapper/AttendanceMapper.xml"/>
+    	<mapper resource="mapper/PaperMapper.xml"/>
+    	<mapper resource="mapper/PaperAssemblyMapper.xml"/>
+    	<mapper resource="mapper/ExamMapper.xml"/>
+    	<mapper resource="mapper/ExamRecordMapper.xml"/>
+    	<mapper resource="mapper/AssessmentMapper.xml"/>
+    </mappers>
+</configuration>

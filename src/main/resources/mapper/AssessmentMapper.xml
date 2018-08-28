@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwadee.dao.IAssessmentDao">
+		<!-- 添加一个返回类型为PersonEntity对象的resultMap -->
+	<resultMap type="com.hwadee.model.AssessmentEntity"
+		id="AssessmentMap">
+		<id property="asse_id" column="asse_id" />
+		<result property="per_id" column="per_id" />
+		<result property="asse_date" column="asse_date" />
+		<result property="asse_score" column="asse_score" />
+		<result property="per_name" column="per_name" />
+	</resultMap>
+	<!-- 添加一条考核成绩记录 -->
+	<insert id="insertAssessment"
+		parameterType="com.hwadee.model.AssessmentEntity">
+		insert into assessment (per_id,asse_date,asse_score,per_name)
+		values (#{per_id},#{asse_date},#{asse_score},#{per_name})
+	</insert>
+	<!-- 根据考核记录编号删除一条记录 -->
+	<delete id="deleteAssessment" parameterType="Int">
+		delete from
+		assessment where asse_id = #{asse_id}
+	</delete>
+	<!-- 批量删除多条记录 -->
+	<delete id="deleteSomeAssessments" parameterType="java.util.List">
+		delete from assessment where asse_id in
+		<foreach item="asse_id" collection="list" open="(" close=")"
+			separator=",">
+			#{asse_id}
+		</foreach>
+	</delete>
+	<!-- 根据姓名搜素考核记录 -->
+	<select id="getAssessmentsByName"  parameterType="String" resultMap="AssessmentMap">
+		select * from assessment where per_name like "%"#{per_name}"%"
+	</select>
+	<!-- 获取所有的考核记录 -->
+		<select id="getAllAssessments"  resultMap="AssessmentMap">
+		select * from assessment 
+	</select>
+	<!-- 通过考核编号获取考核记录 -->
+	<select id="getAssessmentById" parameterType="Int" resultMap="AssessmentMap">
+		select * from assessment where asse_id = #{asse_id}
+	</select>
+	<!-- 通过身份证和年月查询考核记录 -->
+	<select id="getAssessmentByPerIdAndYearMon"  resultMap="AssessmentMap">
+		select * from assessment where per_id = #{param1} and date_format(asse_date,'%Y-%m')= #{param2}
+	</select>
+		<select id="getAssessmentByYearMon" parameterType="String" resultMap="AssessmentMap">
+		select * from assessment where  date_format(asse_date,'%Y-%m')= #{yearmon}
+	</select>
+</mapper>

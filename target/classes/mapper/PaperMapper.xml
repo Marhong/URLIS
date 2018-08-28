@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwadee.dao.IPaperDao">
+	<!-- 添加一个返回类型为PersonEntity对象的resultMap -->
+	<resultMap type="com.hwadee.model.PaperEntity" id="PaperMap">
+		<id property="paper_id" column="paper_id"/>
+		<result property="paper_name" column="paper_name"/>
+		<result property="paper_score" column="paper_score"/>
+		<result property="paper_remark" column="paper_remark"/>
+		<result property="paper_time" column="paper_time"/>
+	</resultMap>
+	<!-- 获取所有的试卷信息 -->
+	<select id="getAllPaper" resultMap="PaperMap">
+		select * from paper
+	</select>
+	<!-- 通过试卷名获取试卷信息 -->
+	<select id="getPaperByName" resultMap="PaperMap" parameterType="String">
+	select * from paper where paper_name like "%"#{paper_name}"%"
+	</select>
+	<!-- 添加一份考卷 -->
+	<insert id="insertPaper" parameterType="com.hwadee.model.PaperEntity">
+		insert into paper (paper_id,paper_name,paper_score,paper_time,paper_remark) values (#{paper_id},#{paper_name},#{paper_score},#{paper_time},#{paper_remark})
+	</insert>
+	<!-- 通过考卷编号获取考卷信息 -->
+	<select id="getPaperById"  parameterType="String" resultMap="PaperMap" >
+		select * from paper where paper_id = #{paper_id}
+	</select>
+	<!-- 更新一份考卷 -->
+	<update id="updatePaper" parameterType="com.hwadee.model.PaperEntity">
+		update paper set paper_name = #{paper_name}, paper_score=#{paper_score}, paper_remark=#{paper_remark}, paper_time=#{paper_time} where paper_id =#{paper_id}
+	</update>
+		<!-- 根据试卷编号删除一个问题 -->
+	<delete id="deletePaper" parameterType="String">
+		delete from paper where paper_id = #{paper_id}
+	</delete>
+		<!-- 批量删除多份考卷 -->
+	<delete id="deleteSomePaper" parameterType="java.util.List">
+		delete  from paper  where paper_id in
+         <foreach item="paper_id" collection="list" open="(" close=")" separator=",">
+             #{paper_id}
+         </foreach>
+	</delete>
+</mapper>

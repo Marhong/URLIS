@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwadee.dao.IQuestionDao">
+
+	<!-- 添加一个返回类型为QuestionEntity对象的resultMap -->
+	<resultMap type="com.hwadee.model.QuestionEntity" id="QuestionMap">
+		<id property="qu_id" column="qu_id"/>
+		<result property="qu_type" column="qu_type"/>
+		<result property="qu_content" column="qu_content"/>
+		<result property="qu_option" column="qu_option"/>
+		<result property="qu_answer" column="qu_answer"/>
+		<result property="qu_score" column="qu_score"/>
+	</resultMap>
+	
+	<!-- 一对多的映射 -->
+		<resultMap type="com.hwadee.model.QuestionEntity" id="queryForListMap">
+		<id property="qu_id" column="qu_id"/>
+		<result property="qu_content" column="qu_content"/>
+		<collection property="options" ofType="com.hwadee.model.OptionEntity">
+		<id property="id" column="option_id"/>
+		<result property="name" column="option_name"/>
+		</collection>
+	</resultMap>
+	<!-- id:对应IQuestionDao里面的方法名 -->
+	<!-- 添加一个问题 -->
+	<insert id="insertQuestion" parameterType="com.hwadee.model.QuestionEntity">
+		INSERT INTO question (qu_id, qu_type, qu_content, qu_option, qu_answer, qu_score) VALUES (#{qu_id},#{qu_type},#{qu_content},#{qu_option},#{qu_answer},#{qu_score})
+	</insert>
+	<!-- 修改一个问题 -->
+	<update id="updateQuestion" parameterType="com.hwadee.model.QuestionEntity">
+		update  question set qu_content = #{qu_content},qu_type = #{qu_type},qu_score = #{qu_score},qu_option = #{qu_option},qu_answer = #{qu_answer}  where qu_id = #{qu_id}
+	</update>
+	<!-- 根据问题编号删除一个问题 -->
+	<delete id="deleteQuestion" parameterType="Int">
+		delete from question where qu_id = #{qu_id}
+	</delete>
+	<!-- 批量删除多个问题 -->
+	<delete id="deleteSomeQuestions" parameterType="java.util.List">
+		delete  from question  where qu_id in
+         <foreach item="qu_id" collection="list" open="(" close=")" separator=",">
+             #{qu_id}
+         </foreach>
+	</delete>
+	<!-- 根据问题内容和问题类别查询问题-->
+	<select id="getQuestionsByContentAndType"   resultMap="QuestionMap">
+		select * from question where qu_type = #{param2} and qu_content like "%"#{param1}"%"
+	</select>
+	<!-- 查询所有的问题 -->
+	<select id="getAllQuestion" resultMap="QuestionMap">
+		select * from question
+	</select>
+	<!-- 根据问题编号查询问题 -->
+	<select id="getQuestionById" parameterType="Int" resultMap="QuestionMap">
+		select * from question where qu_id = #{qu_id}
+	</select>
+</mapper>

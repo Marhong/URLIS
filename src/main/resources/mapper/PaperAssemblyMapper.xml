@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwadee.dao.IPaperAssemblyDao">
+	<!-- 添加一个返回类型为PersonEntity对象的resultMap -->
+	<resultMap type="com.hwadee.model.PaperAssemblyEntity" id="PaperAssemblyMap">
+		<id property="paper_id" column="paper_id"/>
+		<result property="qu_id" column="qu_id"/>
+
+	</resultMap>
+	<!-- 获取所有的试卷信息 -->
+	<select id="getAllPaperAssembly" resultMap="PaperAssemblyMap">
+		select * from paper_assembly
+	</select>
+
+	<!-- 添加一份考卷 -->
+	<insert id="insertPaperAssembly" parameterType="com.hwadee.model.PaperAssemblyEntity">
+		insert into paper_assembly (paper_id,qu_id) values (#{paper_id},#{qu_id})
+	</insert>
+	<select id="getPaperAssemblysById" parameterType="String" resultMap="PaperAssemblyMap">
+		select * from paper_assembly where paper_id = #{paper_id}
+	</select>
+	<!-- 删除某一套试卷的所有组卷记录 -->
+	<delete id="deletePaperAssemblyById" parameterType="String">
+		delete  from paper_assembly where paper_id = #{paper_id}
+	</delete>
+			<!-- 批量删除多份考卷的组卷记录 -->
+	<delete id="deletePaperBySomeId" parameterType="java.util.List">
+		delete  from paper_assembly  where paper_id in
+         <foreach item="paper_id" collection="list" open="(" close=")" separator=",">
+             #{paper_id}
+         </foreach>
+	</delete>
+</mapper>

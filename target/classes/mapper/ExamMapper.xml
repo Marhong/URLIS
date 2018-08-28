@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwadee.dao.IExamDao">
+	<!-- 添加一个返回类型为PersonEntity对象的resultMap -->
+	<resultMap type="com.hwadee.model.ExamEntity" id="ExamMap">
+		<id property="exam_id" column="exam_id" />
+		<result property="paper_id" column="paper_id" />
+		<result property="exam_name" column="exam_name" />
+		<result property="exam_datetime" column="exam_datetime" />
+	</resultMap>
+	<!-- 获取所有的考试 -->
+	<select id="getAllExams" resultMap="ExamMap">
+		select * from exam
+	</select>
+	<!-- 通过考试名称查询考试 -->
+	<select id="getExamsByName" parameterType="String" resultMap="ExamMap">
+		select * from exam where exam_name like "%"#{exam_name}"%"
+	</select>
+	<!-- 通过考试编号查询考试 -->
+	<select id="getExamById" parameterType="Int" resultMap="ExamMap">
+		select * from exam where exam_id = #{exam_id}
+	</select>
+	<!-- 删除一场考试 -->
+	<delete id="deleteExam" parameterType="Int">
+		delete from exam
+		where exam_id = #{exam_id}
+	</delete>
+	<!-- 批量删除考试 -->
+	<delete id="deleteSomeExams" parameterType="java.util.List">
+		delete from exam 
+		where exam_id in
+		<foreach item="exam_id" collection="list" open="(" close=")" separator=",">
+			#{exam_id}
+		</foreach>
+	</delete>
+	<!-- 添加一场考试 -->
+	<insert id="insertExam" parameterType="com.hwadee.model.ExamEntity">
+		insert into exam (paper_id,exam_name,exam_datetime) values (#{paper_id},#{exam_name},#{exam_datetime})
+	</insert>
+	<!-- 查询某一个月内的所有考试 -->
+		<select id="getExamsByYearMon" parameterType="String" resultMap="ExamMap">
+		select * from exam where date_format(exam_datetime,'%Y-%m')= #{yearmon}
+	</select>
+</mapper>

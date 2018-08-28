@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwadee.dao.IPersonDao">
+	<!-- 添加一个返回类型为PersonEntity对象的resultMap -->
+	<resultMap type="com.hwadee.model.PersonEntity" id="PersonMap">
+		<id property="per_id" column="per_id"/>
+		<result property="dept_id" column="dept_id"/>
+		<result property="per_name" column="per_name"/>
+		<result property="per_gender" column="per_gender"/>
+		<result property="per_birthday" column="per_birthday"/>
+		<result property="per_nation" column="per_nation"/>
+		<result property="per_politics" column="per_politics"/>
+		<result property="per_worktime" column="per_worktime"/>
+		<result property="per_tel" column="per_tel"/>
+		<result property="per_state" column="per_state"/>
+		<result property="per_remark" column="per_remark"/>
+		<result property="work_time" column="work_time"/>
+		<result property="work_duty" column="work_duty"/>
+		<result property="password" column="password"/>
+		<result property="pos_name" column="pos_name"/>
+	</resultMap>
+	<!--  获取所有的人员信息 -->
+	<select id="getAllPerson" resultMap="PersonMap">
+		select * from person
+	</select>
+	<!-- 根据身份证号查询人员信息 -->
+	<select id="getPersonById" parameterType="String" resultMap="PersonMap" >
+		select * from person where per_id = #{per_id}
+	</select>
+	<!-- 根据姓名和身份证号查询人员信息 -->
+	<select id="queryPerson" resultMap="PersonMap">
+		select * from person where per_name like "%"#{param1}"%"
+<!-- 		<where>
+		 <if test="#{param2}!=null"> 
+		 and  per_id = #{param2}
+		 </if> 
+		<if test="#{param1}!=null"> 
+		and per_name like "%"#{param1}"%"
+		 </if> 
+		</where>  -->
+	</select>
+	<!-- 根据身份证号删除人员信息 -->
+	<delete id="deletePerson" parameterType="String">
+		delete from person where per_id = #{per_id}
+	</delete>
+	<!-- 根据身份证号批量删除人员信息 -->
+	<delete id="deleSomePerson" parameterType="java.util.List">
+		delete  from person  where per_id in
+         <foreach item="per_id" collection="list" open="(" close=")" separator=",">
+             #{per_id,jdbcType=VARCHAR}
+         </foreach>
+	</delete>
+	<!-- 添加一条新的人员信息 -->
+	<insert id="insertPerson" parameterType="com.hwadee.model.PersonEntity">
+		INSERT INTO person (per_id, dept_id, per_name, per_gender, per_birthday, per_nation,per_politics,per_worktime,per_tel,per_state,per_remark,work_time,work_duty,password,pos_name) VALUES 
+		(#{per_id},#{dept_id},#{per_name},#{per_gender},#{per_birthday},#{per_nation},#{per_politics},#{per_worktime},#{per_tel},#{per_state},#{per_remark},#{work_time},#{work_duty},#{password},#{pos_name})
+	</insert>
+	<!-- 更新一条人员信息 -->
+	<update id="updatePerson" parameterType="com.hwadee.model.PersonEntity">
+		update  person set dept_id=#{dept_id},per_name=#{per_name},per_gender=#{per_gender},per_birthday=#{per_birthday},per_nation=#{per_nation},per_politics=#{per_politics},per_worktime=#{per_worktime},per_tel=#{per_tel},per_state=#{per_state},per_remark=#{per_remark},work_time=#{work_time},work_duty=#{work_duty},password=#{password},pos_name=#{pos_name} where per_id=#{per_id}
+	</update>
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwadee.dao.IExamRecordDao">
+	<!-- 添加一个返回类型为PersonEntity对象的resultMap -->
+	<resultMap type="com.hwadee.model.ExamRecordEntity"
+		id="ExamRecordMap">
+		<id property="exam_id" column="exam_id" />
+		<id property="per_id" column="per_id" />
+		<result property="exam_score" column="exam_score" />
+		<result property="per_name" column="per_name" />
+		<result property="exam_name" column="exam_name" />
+		<result property="dept_name" column="dept_name" />
+		<result property="posname" column="posname" />
+	</resultMap>
+	
+	<insert id="insertExamRecord"
+		parameterType="com.hwadee.model.ExamRecordEntity">
+		insert into exam_record (exam_id,per_id,exam_score,per_name,exam_name,dept_name,posname)
+		values (#{exam_id},#{per_id},#{exam_score},#{per_name},#{exam_name},#{dept_name},#{posname})
+	</insert>
+	<!-- 根据考核记录编号删除一条记录 -->
+	<delete id="deleteExamRecord" >
+		delete from
+		exam_record where exam_id = #{param1} and per_id = #{param2}
+	</delete>
+
+	<!-- 根据姓名搜素考核记录 -->
+	<select id="getExamsByExamId"  parameterType="Int" resultMap="ExamRecordMap">
+		select * from exam_record where exam_id = #{exam_id}
+	</select>
+	<!-- 通过身份证号搜索成绩记录 -->
+	<select id="getRecordssByPerId"  parameterType="String" resultMap="ExamRecordMap">
+	select * from exam_record where per_id = #{per_id}
+	</select>
+		<select id="getAllExamRecords"  resultMap="ExamRecordMap">
+		select * from exam_record 
+	</select>
+		<select id="getExamsByExamNameOrPerName"   resultMap="ExamRecordMap">
+		select * from exam_record 
+		<where>
+		 <if test="#{param1}!=null"> 
+		 and  exam_name like "%"#{param1}"%"
+		 </if> 
+		<if test="#{param2}!=null"> 
+		and per_name like "%"#{param2}"%"
+		 </if> 
+		</where>
+
+	</select>
+</mapper>
