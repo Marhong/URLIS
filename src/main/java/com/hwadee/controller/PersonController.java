@@ -100,6 +100,32 @@ public class PersonController {
 		return new ModelAndView("/PersonnelInformation/PersonnelBasicInformationManagement/index",model);
 
 	}
+	@RequestMapping("/login")
+	@ResponseBody
+	public Map<String, Object> login(String per_id,String password) {
+		SqlSession session = MyBatiesUtil.getSqlSession();
+		IPersonDao personDao = session.getMapper(IPersonDao.class);
+		PersonEntity person = personDao.getPersonById(per_id);
+		Map<String,Object> model = new HashMap<String, Object>();
+		if(person != null) {
+			if(password.equals(person.getPassword())) {
+				model.put("result","success");
+			}else {
+				model.put("result","wrong");
+			}
+		}else {
+			model.put("result","wrong");
+		}
+		MyBatiesUtil.closeSqlSession();
+		return model;
+	}
+	@RequestMapping("/goLogin")
+	public String goLogin() {
+		
+			return "/login";
+
+	}
+
 	/**
 	 * @Title: detailPerson
 	 * @Description: 查看人员详细信息
