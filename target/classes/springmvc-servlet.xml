@@ -16,6 +16,7 @@
     <!-- 放行的静态资源 -->
 	<mvc:resources mapping="/resources/**" location="/resources/" />
     <mvc:resources mapping="/static/**" location="/static/" /> 
+   
 	
     <!-- if you use annotation you must configure following setting -->
     <mvc:annotation-driven />
@@ -71,4 +72,6 @@
         <!-- 后缀 -->
         <property name="suffix" value=".jsp" />
     </bean>
+    
+
 </beans>

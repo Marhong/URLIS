@@ -22,6 +22,10 @@ function getRootPath(){
 }
 function init(){
 	//init
+	
+	if($("#hidepage").val() == "true"){
+		$("#kkpager").hide();
+	}
 	$(function(){
 		var totalPage = $('#totalPage').val();
 		var totalRecords = $('#totalRecords').val();

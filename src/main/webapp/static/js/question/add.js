@@ -111,14 +111,10 @@ function save(url){
 //根据传来的值初始化页面
 function initPage() {
 	$type = $('#qu_type_value');
-	$answer = $('#qu_answer_value');
 
 	$("#qu_type").val($type.val());
-	$("#qu_answer").val($answer.val());
-	if ($type.val() == "判断题") {
+	if ($('#qu_type_value').text() == "判断题") {
 		$('#optionC').parent().parent().hide();
 		$('#optionD').parent().parent().hide();
-		$('#optionc').hide();
-		$('#optiond').hide();
 	}
 }

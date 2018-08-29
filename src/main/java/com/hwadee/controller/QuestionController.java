@@ -191,27 +191,29 @@ public class QuestionController {
 			List<QuestionEntity> tenQuestions = new ArrayList<QuestionEntity>();
 			int count = 0;
 			int no = 0;
+			// 因为数据分页，所以每次最多传10条数据
 			if(pno != null && !pno.equals("")) {
 				no= Integer.parseInt(pno)-1;
 			}else {
 				no=0;
 			}
-			 
-			for(int i=(10*no);i<qulist.size();i++) {
+			// 根据页码更改取数据的起点
+			for(int i=(StaticNumber.PAGE_ITEMS*no);i<qulist.size();i++) {
 				tenQuestions.add(qulist.get(i));
 				count++;
-				if(count == 10) {
+				if(count == StaticNumber.PAGE_ITEMS) {
 					break;
 				}
 			}
 			model.addAttribute("qulist",tenQuestions);
 			model.addAttribute("totalRecords",qulist.size());
 			int totalPage = 0;
-			if(qulist.size()%10 != 0) {
-				totalPage = qulist.size()/10+1;
+			// 设定每页展示10条数据，由此计算总共应有多有页
+			if(qulist.size()%StaticNumber.PAGE_ITEMS != 0) {
+				totalPage = qulist.size()/StaticNumber.PAGE_ITEMS+1;
 				
 			}else {
-				totalPage = qulist.size()/10;
+				totalPage = qulist.size()/StaticNumber.PAGE_ITEMS;
 			
 			}
 			
@@ -288,7 +290,7 @@ public class QuestionController {
 	@ResponseBody
 	public Map<String, Object> deleteSomeQuestions(String ids) {
 		System.out.println("QuestionController运行了");
-		// 将编号字符串转换为List集合
+		// qu_id的list集合
 		List<Integer> list = new ArrayList<Integer>();
 		// 编号字符串是以","作为分隔符
 		String[] idList = ids.split(",");

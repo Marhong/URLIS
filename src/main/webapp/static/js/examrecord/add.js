@@ -116,41 +116,25 @@ function initPage() {
 	}
 }
 
-	// 判断该考试日期是否合法(在当天或当天之后)
-	function isValid(date){
-		var today = new Date();
-		var year = today.getFullYear();
-	    var month = today.getMonth() + 1;
-        var day = today.getDate();
-     
-        var tokens = date.split("-");
-        if(tokens[0]<year){
-        
-        	return false;
-        }else if(tokens[1].charAt(0) != 0  ){
-        	if(tokens[1] < month){
-            	
-            	return false;
-        	}
-        }else if(tokens[1].charAt(0) == 0 ){
-        	if(tokens[1].charAt(1) < month){
-        		
-            	return false;
-        	}  
-        }
-        if(tokens[2].charAt(0) != 0 ) {	
-        	if(tokens[2] < day){
-            	
-            	return false;
-        	} 	
-        }else if(tokens[2].charAt(0) == 0 ){
-        	
-        	if( tokens[2].charAt(1) < day){
-        	
-            	return false;
-        	}	
-        }
-        return true;
-        
-        
-	}
+	
+// 判断该考试日期是否合法(在当天或当天之后)
+function isValid(date){
+	var today = new Date();
+	var year = today.getFullYear();
+    var month = today.getMonth() + 1;
+    var day = today.getDate();
+ 
+    var tokens = date.split("-");
+    if(tokens[0]>year){
+    	return true;
+    }else if(tokens[0] == year){
+    	if(tokens[1] > month || tokens[1].charAt(1) > month){
+    		return true;
+    	}else if(tokens[1] == month || tokens[1].charAt(1) == month){
+    		if(tokens[2] > day || tokens[2].charAt(1) > day){
+    			return true;
+    		}
+    	}
+    }
+    return false;         
+}

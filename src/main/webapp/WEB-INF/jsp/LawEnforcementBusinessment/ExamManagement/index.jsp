@@ -69,7 +69,7 @@
 			<td>${exam.exam_datetime }</td>
             <td>尚未进行</td>
             <td>
-                <a href="/URLIS/examrecord/index?exam_id=${exam.exam_id }">查看成绩</a>
+                <a href="/URLIS/examrecord/getRecordsByExamId?exam_id=${exam.exam_id }" >查看成绩</a>
                   
             </td>
         </tr>
@@ -100,6 +100,7 @@
 		$('#search').click(function() {
 			search();
 		});
+
     });
 
 </script>

@@ -35,6 +35,14 @@ import com.hwadee.util.MyBatiesUtil;
 @RequestMapping("change")
 public class InformationChangeController {
 	
+	/**
+	 * @Title: indexChnage
+	 * @Description: 获取人员信息变更记录
+	 * @Time: 2018年8月29日 下午12:05:02
+	 * @author: wangbin
+	 * @param pno 展示的数据页码，从1开始
+	 * @return
+	 */
 	@RequestMapping("/index")
 	public ModelAndView indexChnage(String pno) {
 		List<InformationChangeEntity> changeList = new ArrayList<InformationChangeEntity>();
@@ -56,27 +64,29 @@ public class InformationChangeController {
 			List<InformationChangeEntity> tenQuestions = new ArrayList<InformationChangeEntity>();
 			int count = 0;
 			int no = 0;
+			// 因为数据分页，所以每次最多传10条数据
 			if(pno != null && !pno.equals("")) {
 				no= Integer.parseInt(pno)-1;
 			}else {
 				no=0;
 			}
-			 
-			for(int i=(10*no);i<changeList.size();i++) {
+			// 根据页码更改取数据的起点
+			for(int i=(StaticNumber.PAGE_ITEMS*no);i<changeList.size();i++) {
 				tenQuestions.add(changeList.get(i));
 				count++;
-				if(count == 10) {
+				if(count == StaticNumber.PAGE_ITEMS) {
 					break;
 				}
 			}
 			model.addAttribute("changeList",tenQuestions);
 			model.addAttribute("totalRecords",changeList.size());
+			// 设定每页展示10条数据，由此计算总共应有多有页
 			int totalPage = 0;
-			if(changeList.size()%10 != 0) {
-				totalPage = changeList.size()/10+1;
+			if(changeList.size()%StaticNumber.PAGE_ITEMS != 0) {
+				totalPage = changeList.size()/StaticNumber.PAGE_ITEMS+1;
 				
 			}else {
-				totalPage = changeList.size()/10;
+				totalPage = changeList.size()/StaticNumber.PAGE_ITEMS;
 			
 			}
 			
@@ -109,9 +119,9 @@ public class InformationChangeController {
 		}	
 	}
 	@RequestMapping("/detail")
-	public ModelAndView detailPerson(String chanid) {
+	public ModelAndView detailChange(String chanid) {
 		String per_id = "",chan_time="";
-		System.out.println(chanid);
+		
 		if(chanid != null) {
 			per_id = chanid.split(" ")[0];
 			chan_time = chanid.split(" ")[1];
@@ -148,7 +158,9 @@ public class InformationChangeController {
 	@ResponseBody
 	public Map<String, Object> deleteSomeChange(String ids) {
 		System.out.println(ids);
-		// 将编号字符串转换为List集合
+		// 存储人员信息变更记录的编号
+		// 因为人员信息变更记录是以per_id和chan_time为主键的所以需要二次分割
+		// 这里设定的是一个人员一天只修改一次信息
 		List<String> chanidList = new ArrayList<String>();
 		List<String> peridList = new ArrayList<String>();
 		List<String> chantimeList = new ArrayList<String>();
@@ -160,6 +172,7 @@ public class InformationChangeController {
 				}
 			System.out.println(chanidList);
 			if(chanidList.size()>0) {
+				// 二次分割得到per_id和chan_time
 				for(int j=0;j<chanidList.size();j++) {
 					String chanid = chanidList.get(j);
 					peridList.add(chanid.split(":")[0]);

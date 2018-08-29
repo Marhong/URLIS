@@ -46,27 +46,29 @@ public class DepartmentController {
 			List<DepartmentEntity> tenQuestions = new ArrayList<DepartmentEntity>();
 			int count = 0;
 			int no = 0;
+			// 因为数据分页，所以每次最多传10条数据
 			if(pno != null && !pno.equals("")) {
 				no= Integer.parseInt(pno)-1;
 			}else {
 				no=0;
 			}
-			 
-			for(int i=(10*no);i<deptlist.size();i++) {
+			// 根据页码更改取数据的起点
+			for(int i=(StaticNumber.PAGE_ITEMS*no);i<deptlist.size();i++) {
 				tenQuestions.add(deptlist.get(i));
 				count++;
-				if(count == 10) {
+				if(count == StaticNumber.PAGE_ITEMS) {
 					break;
 				}
 			}
 			model.addAttribute("deptlist",tenQuestions);
 			model.addAttribute("totalRecords",deptlist.size());
+			// 设定每页展示10条数据，由此计算总共应有多有页
 			int totalPage = 0;
-			if(deptlist.size()%10 != 0) {
-				totalPage = deptlist.size()/10+1;
+			if(deptlist.size()%StaticNumber.PAGE_ITEMS != 0) {
+				totalPage = deptlist.size()/StaticNumber.PAGE_ITEMS+1;
 				
 			}else {
-				totalPage = deptlist.size()/10;
+				totalPage = deptlist.size()/StaticNumber.PAGE_ITEMS;
 			
 			}
 			
@@ -116,6 +118,14 @@ public class DepartmentController {
 		}
 		return resultMap;
 	}
+	/**
+	 * @Title: verifyDepartment
+	 * @Description: 验证该部门是否被注册过
+	 * @Time: 2018年8月29日 上午11:52:09
+	 * @author: wangbin
+	 * @param per_id 部门编号
+	 * @return
+	 */
 	@RequestMapping("/verify")
 	@ResponseBody
 	public Map<String, Object> verifyDepartment(String per_id) {

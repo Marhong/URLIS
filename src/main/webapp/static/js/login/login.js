@@ -34,13 +34,13 @@ function login(){
 	
 	var question = {'per_id':per_id,'password':password};
 	$.ajax({
-		url: getRootPath()+"/person/login",
+		url: getRootPath()+"/verify",
 		  type:'post',
 		  dataType:'json',
 		  data:question,
 		  success:function(data){
 		  	if(data.result == "success"){	
-		  		window.location.href = getRootPath()+"/webindex?per_id="+per_id;
+		  		window.location.href = getRootPath()+"/admin?per_id="+per_id;
 		  	}else if(data.result == "wrong"){
 		  		alert("用户名或密码错误!");
 		  		location.reload();

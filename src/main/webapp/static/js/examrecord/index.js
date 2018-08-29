@@ -158,16 +158,3 @@ function getRootPath(){
   
     }
 
-	// 初始化首页，考试日期在今天之前均为已经结束的考试
-	function initPage() {
-		$('#table tbody tr').each(function(){
-			var datetime = $(this).children("td").eq(4);
-			
-			if(isValid(datetime.text())){
-				$(this).children("td").eq(5).text("尚未进行");
-				
-			}else{
-				$(this).children("td").eq(5).text("结束");
-			}
-		});
-	}

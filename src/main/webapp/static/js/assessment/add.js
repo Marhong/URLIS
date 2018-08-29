@@ -238,13 +238,31 @@ function getRightName(){
 		  }
 		  });	
 }
+function getAttnScore(per_id,yearmon){
+	var question = {'per_id':per_id,'yearmon':yearmon};
+	$.ajax({
+		url: getRootPath()+"/assessment/calAttendanceScore",
+		  type:'post',
+		  async:'false',
+		  dataType:'json',
+		  data:question,
+		  success:function(data){
+		  	$('#attn_score').val(data.score);
+			setName();
+		  },
+		  error:function(){
+		  alert("ajax error");
+		  window.location.href = "add";
+		  }
+		  });
+}
 function initPage(){
 	var asse_date = $("#asse_date").val();
 	var yearmon = asse_date.split("-")[0]+"-"+asse_date.split("-")[1];
 	$('#asse_date').val(asse_date.split("-")[0]+"年"+asse_date.split("-")[1]+"月份");
 	var per_id=$("#per_id").val();
 	calExamScore(per_id,yearmon);
-	calAttnScore(per_id,yearmon);
+	getAttnScore(per_id,yearmon);
 }
     function setCurMon(){
     	var today = new Date();

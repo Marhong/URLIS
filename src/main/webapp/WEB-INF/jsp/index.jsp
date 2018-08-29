@@ -17,7 +17,7 @@
        <!--<img src="/chinapost/Public/assets/img/top.png">-->
       </div>
 
-    <div class="dl-log">欢迎您，<span class="dl-log-user">${per_name }</span><a href="<%=request.getContextPath()%>/logout" title="退出系统" class="dl-log-quit">[退出]</a>
+    <div class="dl-log">欢迎您，<span class="dl-log-user">${per_name }</span><a href="#" title="退出系统" class="dl-log-quit" id="logout">[退出]</a>
     </div>
   </div>
    <div class="content">
@@ -49,6 +49,23 @@
         modulesConfig : config
       });
     });
+	$('#logout').click(function(){
+		if(confirm("确认退出?")){
+			location.href= getRootPath()+"/login"
+		}else{
+			location.reload();
+		}
+	});
+	// 获取工程绝对路径
+	function getRootPath(){
+		   var currentPagepath=location.href;
+		   var pathName = window.document.location.pathname;
+		   var pos = currentPagepath.indexOf(pathName);
+		   var localhostPath = currentPagepath.substring(0,pos);
+		   var projectName = pathName.substring(0,pathName.substr(1).indexOf("/")+1);
+		   return localhostPath+projectName;
+		   
+	}
   </script>
  </body>
 </html>

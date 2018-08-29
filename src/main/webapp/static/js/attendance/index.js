@@ -73,7 +73,7 @@
     function initPage(){
     	$('#table tbody tr').each(function(){
     		
-    		if($(this).children("td").eq(6).text() != "正常"){
+    		if($(this).children("td").eq(7).text() != "正常"){
     			$(this).css('background','red');
     		}
 

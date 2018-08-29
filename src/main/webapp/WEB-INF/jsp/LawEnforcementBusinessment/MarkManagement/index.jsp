@@ -44,9 +44,11 @@
 
    &nbsp;&nbsp;&nbsp;&nbsp; <button type="button" id="search" class="btn btn-primary">查询</button>&nbsp;&nbsp;&nbsp;&nbsp; <button type="button" class="btn btn-primary" id="add">新增成绩</button>&nbsp;&nbsp;&nbsp;&nbsp; <button type="button" class="btn btn-primary" id="deleteSome">删除</button>
 </form>
+
 <form class="form-inline definewidth m20" action="index.html" method="post"> 
 <input type="hidden" id="totalRecords" value=${totalRecords } />
 		<input type="hidden" id="totalPage" value=${totalPage } />
+		<input type="hidden" id="hidepage" value=${hidepage } />
 <table class="table table-bordered table-hover definewidth m10" id="table">
     <thead>
     <tr>

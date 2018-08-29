@@ -37,6 +37,14 @@ import com.hwadee.util.MyBatiesUtil;
 @RequestMapping("exam")
 public class ExamController {
 
+	/**
+	 * @Title: indexExam
+	 * @Description: 获取考试记录
+	 * @Time: 2018年8月29日 上午11:54:10
+	 * @author: wangbin
+	 * @param pno 展示的数据页码，从1开始
+	 * @return
+	 */
 	@RequestMapping("/index")
 	public ModelAndView indexExam(String pno) {
 		List<ExamEntity> examlist = new ArrayList<ExamEntity>();
@@ -56,27 +64,29 @@ public class ExamController {
 			List<ExamEntity> tenQuestions = new ArrayList<ExamEntity>();
 			int count = 0;
 			int no = 0;
+			// 因为数据分页，所以每次最多传10条数据
 			if(pno != null && !pno.equals("")) {
 				no= Integer.parseInt(pno)-1;
 			}else {
 				no=0;
 			}
-			 
-			for(int i=(10*no);i<examlist.size();i++) {
+			// 根据页码更改取数据的起点
+			for(int i=(StaticNumber.PAGE_ITEMS*no);i<examlist.size();i++) {
 				tenQuestions.add(examlist.get(i));
 				count++;
-				if(count == 10) {
+				if(count == StaticNumber.PAGE_ITEMS) {
 					break;
 				}
 			}
 			model.addAttribute("examlist",tenQuestions);
 			model.addAttribute("totalRecords",examlist.size());
+			// 设定每页展示10条数据，由此计算总共应有多有页
 			int totalPage = 0;
-			if(examlist.size()%10 != 0) {
-				totalPage = examlist.size()/10+1;
+			if(examlist.size()%StaticNumber.PAGE_ITEMS != 0) {
+				totalPage = examlist.size()/StaticNumber.PAGE_ITEMS+1;
 				
 			}else {
-				totalPage = examlist.size()/10;
+				totalPage = examlist.size()/StaticNumber.PAGE_ITEMS;
 			
 			}
 			
@@ -123,6 +133,7 @@ public class ExamController {
 		examList = examDao.getExamsByName(exam_name);
 		if(examList != null) {
 			for(ExamEntity exam: examList) {
+				// 将exam_id改为exam_name以便在jsp页面展示
 				exam.setPaper_id(paperDao.getPaperById(exam.getPaper_id()).getPaper_name());
 			}
 		}
@@ -139,7 +150,7 @@ public class ExamController {
 	@ResponseBody
 	public Map<String, Object> deleteSomeExams(String ids) {
 	
-		// 将编号字符串转换为List集合
+		// 存储exam_id的list集合
 		List<Integer> list = new ArrayList<Integer>();
 		// 编号字符串是以","作为分隔符
 		String[] idList = ids.split(",");
@@ -171,7 +182,7 @@ public class ExamController {
 		return resultMap;
 	}
 	@ModelAttribute("paperlist")
-	public Map<String, String> getDepartmentList(){
+	public Map<String, String> getPaperList(){
 		Map<String, String> paperMap = new HashMap<String, String>();
 		List<PaperEntity> paperlist = new ArrayList<PaperEntity>();
 		SqlSession session = MyBatiesUtil.getSqlSession();

@@ -157,7 +157,7 @@ function getRootPath(){
     	
     	var today = new Date();
     	var day = today.getDate();
-    	if(day == 28){
+    	if(day == 1){
     		$("#generate").show();
     	}else{
     		$("#generate").hide();

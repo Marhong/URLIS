@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<title>城乡执法管理系统</title>
+<title>城乡执法后台管理系统</title>
 <meta name="author" content="DeathGhost" />
 
    <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/css/loginstyle.css" tppabs="css/style.css" />
@@ -41,7 +41,7 @@ $(document).ready(function() {
 <body>
 <dl class="admin_login">
  <dt>
-  <strong>城乡执法管理系统</strong>
+  <strong>城乡执法后台管理系统</strong>
   <em>Management System</em>
  </dt>
  <dd class="user_icon">
@@ -55,7 +55,7 @@ $(document).ready(function() {
     <input type="text" id="J_codetext" placeholder="验证码" maxlength="4" class="login_txtbx">
     <canvas class="J_codeimg" id="myCanvas" onclick="createCode()">对不起，您的浏览器不支持canvas，请下载最新版浏览器!</canvas>
   </div>
-  <input type="button" value="更换验证码" class="ver_btn" onClick="createCode();">
+  <input type="button" value="获取验证码" class="ver_btn" onClick="createCode();">
  </dd>
  <dd>
   <input type="button" value="立即登陆" id="login" class="submit_btn"/>

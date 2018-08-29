@@ -142,12 +142,14 @@ function getRootPath(){
 
            $("#table").append(tbody);
            $('#kkpager').hide();
+           initPage();
     	}else{
     		alert("暂无数据");
     		
     	}
   
     }
+
 	// 判断该考试日期是否合法(在当天或当天之后)
 	function isValid(date){
 		var today = new Date();
@@ -156,35 +158,18 @@ function getRootPath(){
         var day = today.getDate();
      
         var tokens = date.split("-");
-        if(tokens[0]<year){
-        
-        	return false;
-        }else if(tokens[1].charAt(0) != 0  ){
-        	if(tokens[1] < month){
-            	
-            	return false;
+        if(tokens[0]>year){
+        	return true;
+        }else if(tokens[0] == year){
+        	if(tokens[1] > month || tokens[1].charAt(1) > month){
+        		return true;
+        	}else if(tokens[1] == month || tokens[1].charAt(1) == month){
+        		if(tokens[2] > day || tokens[2].charAt(1) > day){
+        			return true;
+        		}
         	}
-        }else if(tokens[1].charAt(0) == 0 ){
-        	if(tokens[1].charAt(1) < month){
-        		
-            	return false;
-        	}  
         }
-        if(tokens[2].charAt(0) != 0 ) {	
-        	if(tokens[2] < day){
-            	
-            	return false;
-        	} 	
-        }else if(tokens[2].charAt(0) == 0 ){
-        	
-        	if( tokens[2].charAt(1) < day){
-        	
-            	return false;
-        	}	
-        }
-        return true;
-        
-        
+        return false;         
 	}
 	// 初始化首页，考试日期在今天之前均为已经结束的考试
 	function initPage() {
@@ -193,7 +178,8 @@ function getRootPath(){
 			
 			if(isValid(datetime.text())){
 				$(this).children("td").eq(5).text("尚未进行");
-				
+				$(this).children("td").eq(6).text("暂无成绩");
+				$(this).find("td:last").find("a:first").attr('href','#');
 			}else{
 				$(this).children("td").eq(5).text("结束");
 			}

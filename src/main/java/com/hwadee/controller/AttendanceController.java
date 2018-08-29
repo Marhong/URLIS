@@ -51,27 +51,29 @@ public class AttendanceController {
 			List<AttendanceEntity> tenQuestions = new ArrayList<AttendanceEntity>();
 			int count = 0;
 			int no = 0;
+			// 因为数据分页，所以每次最多传10条数据
 			if(pno != null && !pno.equals("")) {
 				no= Integer.parseInt(pno)-1;
 			}else {
 				no=0;
 			}
-			 
-			for(int i=(10*no);i<attnlist.size();i++) {
+			// 根据页码更改取数据的起点
+			for(int i=(StaticNumber.PAGE_ITEMS*no);i<attnlist.size();i++) {
 				tenQuestions.add(attnlist.get(i));
 				count++;
-				if(count == 10) {
+				if(count == StaticNumber.PAGE_ITEMS) {
 					break;
 				}
 			}
 			model.addAttribute("attnlist",tenQuestions);
 			model.addAttribute("totalRecords",attnlist.size());
 			int totalPage = 0;
-			if(attnlist.size()%10 != 0) {
-				totalPage = attnlist.size()/10+1;
+			// 设定每页展示10条数据，由此计算总共应有多有页
+			if(attnlist.size()%StaticNumber.PAGE_ITEMS != 0) {
+				totalPage = attnlist.size()/StaticNumber.PAGE_ITEMS+1;
 				
 			}else {
-				totalPage = attnlist.size()/10;
+				totalPage = attnlist.size()/StaticNumber.PAGE_ITEMS;
 			
 			}
 			
@@ -105,7 +107,7 @@ public class AttendanceController {
 		return new ModelAndView("/JobPerformanceAssessment/AttendanceManagement/add");
 	}
 	@RequestMapping("/add")
-	public ModelAndView addaAssessment() {
+	public ModelAndView addaAttendance() {
 
 		return new ModelAndView("/JobPerformanceAssessment/AttendanceManagement/add");
 	}
@@ -114,9 +116,17 @@ public class AttendanceController {
 
 		return new ModelAndView("/JobPerformanceAssessment/AttendanceManagement/endwork");
 	}
+	/**
+	 * @Title: saveAttendance
+	 * @Description: 上班打卡
+	 * @Time: 2018年8月29日 上午11:47:14
+	 * @author: wangbin
+	 * @param per_id 身份证
+	 * @return
+	 */
 	@RequestMapping("/save")
 	@ResponseBody
-	public Map<String, Object> saveAssessment(String  per_id) {
+	public Map<String, Object> saveAttendance(String  per_id) {
 
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		SqlSession session = MyBatiesUtil.getSqlSession();
@@ -125,6 +135,7 @@ public class AttendanceController {
 		PersonEntity person = personDao.getPersonById(per_id);
 		if (person != null) {
 			String per_name = person.getPer_name();
+			// 获取当前的年月日 2018-08-25
 			Calendar calendar = Calendar.getInstance();
 			String attn_date = String.valueOf(calendar.get(Calendar.YEAR))+"-";
 			String month=String.valueOf(calendar.get(Calendar.MONTH)+1);
@@ -137,11 +148,13 @@ public class AttendanceController {
 			}
 			attn_date += month +"-"+day;
 			String attn_status ="";
+			// 获取当前的时分秒 08:15:20
 			String start_time = "",hour="",min="",sec="";
 			hour = String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
 			min = String.valueOf(calendar.get(Calendar.MINUTE));
 			sec = String.valueOf(calendar.get(Calendar.SECOND));
-			if(compTime(hour+":"+min+":"+sec, "8:0:0")) {
+			// 如果当前时间比规定上班时间晚，则为迟到
+			if(compTime(hour+":"+min+":"+sec, StaticNumber.START_WORK)) {
 				attn_status = "迟到";
 			}else {
 				attn_status = "正常";
@@ -159,11 +172,14 @@ public class AttendanceController {
 			String end_time = "00:00:00";
 			boolean flag = false;
 			AttendanceEntity oldAttendanceEntity = attendanceDao.getAttnByPerIdAndDate(per_id, attn_date);
+			// 判断当前打卡人员是否是重复打卡
 			if(oldAttendanceEntity != null) {
+				// 如果是，则更新打卡时间
 				oldAttendanceEntity.setAttn_status(attn_status);
 				oldAttendanceEntity.setStart_time(start_time);
 				 flag = attendanceDao.updateWholeAttendance(oldAttendanceEntity);
 			}else {
+				// 如果不是则添加该人员的打开记录
 				AttendanceEntity attendanceEntity = new AttendanceEntity();
 				attendanceEntity.setAttn_date(attn_date);
 				attendanceEntity.setAttn_status(attn_status);
@@ -186,6 +202,14 @@ public class AttendanceController {
 		MyBatiesUtil.closeSqlSession();
 		return resultMap;
 	}
+	/**
+	 * @Title: updateAttendance
+	 * @Description: 下班打卡
+	 * @Time: 2018年8月29日 上午11:47:29
+	 * @author: wangbin
+	 * @param per_id 身份证
+	 * @return
+	 */
 	@RequestMapping("/update")
 	@ResponseBody
 	public  Map<String, Object> updateAttendance(String per_id) {
@@ -194,6 +218,7 @@ public class AttendanceController {
 		IAttendanceDao attendanceDao = session.getMapper(IAttendanceDao.class);
 		
 		Calendar calendar = Calendar.getInstance();
+		// 当前年月日 2018-08-25
 		String attn_date = String.valueOf(calendar.get(Calendar.YEAR))+"-";
 		String month=String.valueOf(calendar.get(Calendar.MONTH)+1);
 		String day=String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
@@ -207,11 +232,13 @@ public class AttendanceController {
 		AttendanceEntity attendanceEntity = attendanceDao.getAttnByPerIdAndDate(per_id, attn_date);
 		String attn_status = "";
 		if(attendanceEntity != null) {
+			// 当前时分秒 18:10:20
 			String end_time = "",hour="",min="",sec="";
 			hour = String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
 			min = String.valueOf(calendar.get(Calendar.MINUTE));
 			sec = String.valueOf(calendar.get(Calendar.SECOND));
-			if(!compTime(hour+":"+min+":"+sec, "18:0:0")) {
+			// 如果当前时间早于规定下班时间则为早退
+			if(!compTime(hour+":"+min+":"+sec, StaticNumber.END_WORK)) {
 				attn_status = "早退";
 			}else {
 				attn_status = "正常";
@@ -240,6 +267,15 @@ public class AttendanceController {
 		
 		return resultMap;
 	}
+	/**
+	 * @Title: compTime
+	 * @Description: 比较两个时间的早晚 
+	 * @Time: 2018年8月29日 上午11:49:04
+	 * @author: wangbin
+	 * @param s1 18:20:30
+	 * @param s2 18:30:30
+	 * @return 如果s2比s1早则返回true
+	 */
 	public  boolean compTime(String s1,String s2){
 		try {
 			if (s1.indexOf(":")<0||s2.indexOf(":")<0) {

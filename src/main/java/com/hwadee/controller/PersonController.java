@@ -39,13 +39,14 @@ import com.hwadee.util.MyBatiesUtil;
 @RequestMapping("person")
 public class PersonController {
 	
+
 	/**
 	 * @Title: indexPerson
-	 * @Description: 跳转到人员信息管理首页面
-	 * @Time: 2018年8月23日 下午4:12:18
+	 * @Description: 获取人员信息
+	 * @Time: 2018年8月29日 下午12:14:30
 	 * @author: wangbin
-	 * @param model 传递给首页面的数据
-	 * @return 人员信息管理首页面地址
+	 * @param pno 展示的数据页码，从1开始
+	 * @return
 	 */
 	@RequestMapping("/index")
 	public ModelAndView indexPerson(String pno) {
@@ -60,6 +61,7 @@ public class PersonController {
 				DepartmentEntity dept = deptDao.getDeptById(dept_id);
 
 				if(dept != null) {
+					// 因为要展示单位名称，所以将dept_id值改为dept_name
 					person.setDept_id(dept.getDept_name());
 				}
 			}
@@ -70,27 +72,29 @@ public class PersonController {
 			List<PersonEntity> tenQuestions = new ArrayList<PersonEntity>();
 			int count = 0;
 			int no = 0;
+			// 因为数据分页，所以每次最多传10条数据
 			if(pno != null && !pno.equals("")) {
 				no= Integer.parseInt(pno)-1;
 			}else {
 				no=0;
 			}
-			 
-			for(int i=(10*no);i<perlist.size();i++) {
+			// 根据页码更改取数据的起点
+			for(int i=(StaticNumber.PAGE_ITEMS*no);i<perlist.size();i++) {
 				tenQuestions.add(perlist.get(i));
 				count++;
-				if(count == 10) {
+				if(count == StaticNumber.PAGE_ITEMS) {
 					break;
 				}
 			}
 			model.addAttribute("perlist",tenQuestions);
 			model.addAttribute("totalRecords",perlist.size());
+			// 设定每页展示10条数据，由此计算总共应有多有页
 			int totalPage = 0;
-			if(perlist.size()%10 != 0) {
-				totalPage = perlist.size()/10+1;
+			if(perlist.size()%StaticNumber.PAGE_ITEMS != 0) {
+				totalPage = perlist.size()/StaticNumber.PAGE_ITEMS+1;
 				
 			}else {
-				totalPage = perlist.size()/10;
+				totalPage = perlist.size()/StaticNumber.PAGE_ITEMS;
 			
 			}
 			
@@ -100,31 +104,8 @@ public class PersonController {
 		return new ModelAndView("/PersonnelInformation/PersonnelBasicInformationManagement/index",model);
 
 	}
-	@RequestMapping("/login")
-	@ResponseBody
-	public Map<String, Object> login(String per_id,String password) {
-		SqlSession session = MyBatiesUtil.getSqlSession();
-		IPersonDao personDao = session.getMapper(IPersonDao.class);
-		PersonEntity person = personDao.getPersonById(per_id);
-		Map<String,Object> model = new HashMap<String, Object>();
-		if(person != null) {
-			if(password.equals(person.getPassword())) {
-				model.put("result","success");
-			}else {
-				model.put("result","wrong");
-			}
-		}else {
-			model.put("result","wrong");
-		}
-		MyBatiesUtil.closeSqlSession();
-		return model;
-	}
-	@RequestMapping("/goLogin")
-	public String goLogin() {
-		
-			return "/login";
 
-	}
+
 
 	/**
 	 * @Title: detailPerson
@@ -290,6 +271,14 @@ public class PersonController {
 			return resultMap;
 		}	
 	}
+	/**
+	 * @Title: verifyPerson
+	 * @Description: 验证该人员是否存在
+	 * @Time: 2018年8月29日 下午12:16:23
+	 * @author: wangbin
+	 * @param per_id 身份证
+	 * @return
+	 */
 	@RequestMapping("/verify")
 	@ResponseBody
 	public Map<String, Object> verifyPerson(String per_id) {
@@ -368,7 +357,7 @@ public class PersonController {
 	@ResponseBody
 	public Map<String, Object> deleteSomePerson(String ids) {
 		
-		// 将编号字符串转换为List集合
+		// per_id的list集合
 		List<String> list = new ArrayList<String>();
 		// 编号字符串是以","作为分隔符
 		String[] idList = ids.split(",");
@@ -393,6 +382,13 @@ public class PersonController {
 		}
 		return resultMap;
 	}
+	/**
+	 * @Title: generateChange
+	 * @Description: 根据人员信息变更生成相应的人员信息变更记录
+	 * @Time: 2018年8月29日 下午12:17:18
+	 * @author: wangbin
+	 * @param newperson
+	 */
 	public void generateChange(PersonEntity newperson) {
 		String per_id = newperson.getPer_id();
 		SqlSession session = MyBatiesUtil.getSqlSession();
@@ -471,6 +467,7 @@ public class PersonController {
 		MyBatiesUtil.closeSqlSession();
 		if(departmentList.size()>0) {
 			for(DepartmentEntity dept: departmentList) {
+				// 因为要展示单位名称，所以将dept_id值改为dept_name 
 				deptList.put(dept.getDept_id(), dept.getDept_name());
 			}
 		}

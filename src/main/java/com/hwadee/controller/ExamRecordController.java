@@ -4,6 +4,7 @@
 package com.hwadee.controller;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,65 +42,81 @@ import com.hwadee.util.MyBatiesUtil;
 @RequestMapping("examrecord")
 public class ExamRecordController {
 
-/*	@RequestMapping("/index")
-	public ModelAndView indexExamRecord(String exam_id) {
-		List<ExamRecordEntity> recordlist = new ArrayList<ExamRecordEntity>();
-		SqlSession session = MyBatiesUtil.getSqlSession();
-		IExamRecordDao recordDao = session.getMapper(IExamRecordDao.class);
-	
-		if(exam_id != null && !exam_id.equals("")) {
-			recordlist = recordDao.getExamsByExamId(Integer.parseInt(exam_id));
-		}else {
-			recordlist = recordDao.getAllExamRecords();
-		}
 
-		MyBatiesUtil.closeSqlSession();
-		ModelMap model = new ModelMap();
-		
-		model.addAttribute("recordlist",recordlist);
-
-		return new ModelAndView("/LawEnforcementBusinessment/MarkManagement/index",model);
-	}*/
+	/**
+	 * @Title: indexExamRecord
+	 * @Description: 获取考试成绩记录
+	 * @Time: 2018年8月29日 上午11:56:29
+	 * @author: wangbin
+	 * @param pno 展示的数据页码，从1开始
+	 * @return
+	 */
 	@RequestMapping("/index")
 	public ModelAndView indexExamRecord(String pno) {
 		List<ExamRecordEntity> recordlist = new ArrayList<ExamRecordEntity>();
+		ModelMap model = new ModelMap();
 		SqlSession session = MyBatiesUtil.getSqlSession();
 		IExamRecordDao recordDao = session.getMapper(IExamRecordDao.class);
-	
-		recordlist = recordDao.getAllExamRecords();
-		MyBatiesUtil.closeSqlSession();
-		ModelMap model = new ModelMap();
-		if(recordlist.size()>0) {
-			List<ExamRecordEntity> tenQuestions = new ArrayList<ExamRecordEntity>();
-			int count = 0;
-			int no = 0;
-			if(pno != null && !pno.equals("")) {
-				no= Integer.parseInt(pno)-1;
-			}else {
-				no=0;
-			}
-			 
-			for(int i=(10*no);i<recordlist.size();i++) {
-				tenQuestions.add(recordlist.get(i));
-				count++;
-				if(count == 10) {
-					break;
+			recordlist = recordDao.getAllExamRecords();
+			if(recordlist.size()>0) {
+				List<ExamRecordEntity> tenQuestions = new ArrayList<ExamRecordEntity>();
+				int count = 0;
+				int no = 0;
+				// 因为数据分页，所以每次最多传10条数据
+				if(pno != null && !pno.equals("")) {
+					no= Integer.parseInt(pno)-1;
+				}else {
+					no=0;
 				}
-			}
-			model.addAttribute("recordlist",tenQuestions);
-			model.addAttribute("totalRecords",recordlist.size());
-			int totalPage = 0;
-			if(recordlist.size()%10 != 0) {
-				totalPage = recordlist.size()/10+1;
+				// 根据页码更改取数据的起点
+				for(int i=(10*no);i<recordlist.size();i++) {
+					tenQuestions.add(recordlist.get(i));
+					count++;
+					if(count == 10) {
+						break;
+					}
+				}
+				model.addAttribute("recordlist",tenQuestions);
+				model.addAttribute("totalRecords",recordlist.size());
+				int totalPage = 0;
+				// 设定每页展示10条数据，由此计算总共应有多有页
+				if(recordlist.size()%10 != 0) {
+					totalPage = recordlist.size()/10+1;
+					
+				}else {
+					totalPage = recordlist.size()/10;
 				
-			}else {
-				totalPage = recordlist.size()/10;
-			
+				}
+				
+				model.addAttribute("totalPage",totalPage);
 			}
 			
-			model.addAttribute("totalPage",totalPage);
+		MyBatiesUtil.closeSqlSession();
+		model.addAttribute("hidepage","false");
+		return new ModelAndView("/LawEnforcementBusinessment/MarkManagement/index",model);
+	}
+	/**
+	 * @Title: getRecordsByExamId
+	 * @Description: 获取某一场考试的所有考试记录
+	 * @Time: 2018年8月29日 下午12:00:04
+	 * @author: wangbin
+	 * @param exam_id 待查询的考试编号
+	 * @return
+	 */
+	@RequestMapping("/getRecordsByExamId")
+	public ModelAndView getRecordsByExamId(String exam_id) {
+		List<ExamRecordEntity> recordlist = new ArrayList<ExamRecordEntity>();
+		ModelMap model = new ModelMap();
+		SqlSession session = MyBatiesUtil.getSqlSession();
+		IExamRecordDao recordDao = session.getMapper(IExamRecordDao.class);
+		if(exam_id != null) {
+			
+			recordlist = recordDao.getExamsByExamId(Integer.parseInt(exam_id));
+			// 如果是从考试成绩页面点击查看成绩跳转到成绩页面则隐藏分页按钮
+			model.addAttribute("hidepage","true");
+			model.addAttribute("recordlist",recordlist);
 		}
-		
+		MyBatiesUtil.closeSqlSession();
 		return new ModelAndView("/LawEnforcementBusinessment/MarkManagement/index",model);
 	}
 	@RequestMapping("/add")
@@ -159,8 +176,8 @@ public class ExamRecordController {
 	@RequestMapping("/deleteSome")
 	@ResponseBody
 	public Map<String, Object> deleteSomeRecords(String ids) {
-		System.out.println(ids);
-		// 将编号字符串转换为List集合
+		// 存储考试成绩编号的list集合
+		// 考试成绩记录是以exam_id和per_id作为主键。所以需要二次分割
 		List<String> recordidList = new ArrayList<String>();
 		List<Integer> examidList = new ArrayList<Integer>();
 		List<String> peridList = new ArrayList<String>();
@@ -172,6 +189,7 @@ public class ExamRecordController {
 				}
 			System.out.println(recordidList);
 			if(recordidList.size()>0) {
+				// 二次分割，得到exam_id和per_id
 				for(int j=0;j<recordidList.size();j++) {
 					String recordid = recordidList.get(j);
 					examidList.add(Integer.parseInt(recordid.split(":")[0]));
@@ -227,9 +245,25 @@ public class ExamRecordController {
 		IExamDao examdao = session.getMapper(IExamDao.class);
 		examlist = examdao.getAllExams();
 		MyBatiesUtil.closeSqlSession();
+		Calendar calendar = Calendar.getInstance();
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH)+1;
+		int day = calendar.get(Calendar.DAY_OF_MONTH);
 		if(examlist.size()>0) {
+			// 只展示在当前日期的考试
 			for(ExamEntity exam: examlist) {
-				list.put(exam.getExam_id(),exam.getExam_name());
+				String[] tokens = exam.getExam_datetime().split("-");
+				int curYear = Integer.parseInt(tokens[0]);
+				int curMonth = Integer.parseInt(tokens[1]);
+				int curDay = Integer.parseInt(tokens[2]);
+				if(curYear<year) {
+					list.put(exam.getExam_id(),exam.getExam_name());
+				}else if(curMonth < month) {
+					list.put(exam.getExam_id(),exam.getExam_name());
+				}else if(curDay < day) {
+					list.put(exam.getExam_id(),exam.getExam_name());
+				}
+				
 			}
 		}
 		return list;

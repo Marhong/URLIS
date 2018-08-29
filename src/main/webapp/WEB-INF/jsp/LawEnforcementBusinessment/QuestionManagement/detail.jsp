@@ -34,9 +34,7 @@
 <table class="table table-bordered table-hover definewidth m10">
     <tr>
 		<td width="10%" class="tableleft">题目类别</td>
-       <td><p  id="qu_type_value"/>
-				${question.qu_type}
-			</p>
+       <td><p  id="qu_type_value">${question.qu_type}</p>
 		</td>
 	</tr>
     <tr>

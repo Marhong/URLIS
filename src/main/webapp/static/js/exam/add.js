@@ -165,33 +165,16 @@ function format(date){
         var day = today.getDate();
      
         var tokens = date.split("-");
-        if(tokens[0]<year){
-        
-        	return false;
-        }else if(tokens[1].charAt(0) != 0  ){
-        	if(tokens[1] < month){
-            	
-            	return false;
+        if(tokens[0]>year){
+        	return true;
+        }else if(tokens[0] == year){
+        	if(tokens[1] > month || tokens[1].charAt(1) > month){
+        		return true;
+        	}else if(tokens[1] == month || tokens[1].charAt(1) == month){
+        		if(tokens[2] > day || tokens[2].charAt(1) > day){
+        			return true;
+        		}
         	}
-        }else if(tokens[1].charAt(0) == 0 ){
-        	if(tokens[1].charAt(1) < month){
-        		
-            	return false;
-        	}  
         }
-        if(tokens[2].charAt(0) != 0 ) {	
-        	if(tokens[2] < day){
-            	
-            	return false;
-        	} 	
-        }else if(tokens[2].charAt(0) == 0 ){
-        	
-        	if( tokens[2].charAt(1) < day){
-        	
-            	return false;
-        	}	
-        }
-        return true;
-        
-        
+        return false;         
 	}

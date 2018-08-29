@@ -36,6 +36,14 @@ import com.hwadee.util.MyBatiesUtil;
 @RequestMapping("paper")
 public class PaperController {
 
+	/**
+	 * @Title: indexPaper
+	 * @Description: 获取试卷
+	 * @Time: 2018年8月29日 下午12:09:57
+	 * @author: wangbin
+	 * @param pno 展示的数据页码，从1开始
+	 * @return
+	 */
 	@RequestMapping("/index")
 	public ModelAndView indexPaper(String pno) {
 		List<PaperEntity> paperlist = new ArrayList<PaperEntity>();
@@ -48,27 +56,29 @@ public class PaperController {
 			List<PaperEntity> tenQuestions = new ArrayList<PaperEntity>();
 			int count = 0;
 			int no = 0;
+			// 因为数据分页，所以每次最多传10条数据
 			if(pno != null && !pno.equals("")) {
 				no= Integer.parseInt(pno)-1;
 			}else {
 				no=0;
 			}
-			 
-			for(int i=(10*no);i<paperlist.size();i++) {
+			// 根据页码更改取数据的起点
+			for(int i=(StaticNumber.PAGE_ITEMS*no);i<paperlist.size();i++) {
 				tenQuestions.add(paperlist.get(i));
 				count++;
-				if(count == 10) {
+				if(count == StaticNumber.PAGE_ITEMS) {
 					break;
 				}
 			}
 			model.addAttribute("paperlist",tenQuestions);
 			model.addAttribute("totalRecords",paperlist.size());
 			int totalPage = 0;
-			if(paperlist.size()%10 != 0) {
-				totalPage = paperlist.size()/10+1;
+			// 设定每页展示10条数据，由此计算总共应有多有页
+			if(paperlist.size()%StaticNumber.PAGE_ITEMS != 0) {
+				totalPage = paperlist.size()/StaticNumber.PAGE_ITEMS+1;
 				
 			}else {
-				totalPage = paperlist.size()/10;
+				totalPage = paperlist.size()/StaticNumber.PAGE_ITEMS;
 			
 			}
 			
@@ -118,8 +128,8 @@ public class PaperController {
 		String id = String.valueOf(System.currentTimeMillis()).substring(0, 10);
 		paper.setPaper_id(id);
 		boolean flag = paperDao.insertPaper(paper);
-		// 通过分解得到的题目id，生成一个个的PaperAssemblyEntity
 		
+		// 通过分解得到的题目id，生成一个个的PaperAssemblyEntity，并插入到paper_assembly表中
 		String[] ids = idString.split(",");
 		for(int i=0;i<ids.length;i++) {
 			if(ids[i] != null && !ids[i].equals("")) {
@@ -141,7 +151,7 @@ public class PaperController {
 		return resultMap;
 	}
 	@RequestMapping("/detail")
-	public ModelAndView detailQuestion(String paper_id) {
+	public ModelAndView detailPaper(String paper_id) {
 		
 		SqlSession session = MyBatiesUtil.getSqlSession();
 		IPaperDao paperDao = session.getMapper(IPaperDao.class);
@@ -149,11 +159,10 @@ public class PaperController {
 		IQuestionDao questionDao = session.getMapper(IQuestionDao.class);
 		PaperEntity paper = paperDao.getPaperById(paper_id);
 		
-		List<PaperAssemblyEntity> assemblyEntities = assemblyDao.getPaperAssemblysById(paper_id);
-		
+		List<PaperAssemblyEntity> assemblyEntities = assemblyDao.getPaperAssemblysById(paper_id);	
 		List<QuestionEntity> qulist = new ArrayList<QuestionEntity>();
 		
-		
+		// 将该试卷信息和该试卷的所有问题信息传给jsp页面
 		if(paper != null && assemblyEntities != null) {
 			
 			ModelMap modelMap = new ModelMap();
@@ -183,11 +192,10 @@ public class PaperController {
 		IQuestionDao questionDao = session.getMapper(IQuestionDao.class);
 		PaperEntity paper = paperDao.getPaperById(paper_id);
 		
-		List<PaperAssemblyEntity> assemblyEntities = assemblyDao.getPaperAssemblysById(paper_id);
-		
+		List<PaperAssemblyEntity> assemblyEntities = assemblyDao.getPaperAssemblysById(paper_id);	
 		List<QuestionEntity> qulist = new ArrayList<QuestionEntity>();
 		
-		
+		// 将该试卷信息和该试卷的所有问题信息传给jsp页面 
 		if(paper != null && assemblyEntities != null) {
 			
 			ModelMap modelMap = new ModelMap();
@@ -268,9 +276,9 @@ public class PaperController {
 	}
 	@RequestMapping("/deleteSome")
 	@ResponseBody
-	public Map<String, Object> deleteSomePerson(String ids) {
+	public Map<String, Object> deleteSomePaper(String ids) {
 		
-		// 将编号字符串转换为List集合
+		// 存储paper_id的list集合
 		List<String> list = new ArrayList<String>();
 		// 编号字符串是以","作为分隔符
 		String[] idList = ids.split(",");
